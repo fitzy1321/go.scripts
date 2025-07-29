@@ -40,6 +40,12 @@ func TestChannel(t *testing.T) {
 				defer wg.Done()
 				kv_chan <- Pair[string, int]{First: fmt.Sprintf("key_%d", i), Second: i}
 			}()
+
+			// golang v1.25 WaitGroup.Go()
+			// replaces `wg.Add(1); go func() {defer wg.Done(); ... }();`.
+			// wg.Go(func() {
+			// 	kv_chan <- Pair[string, int]{First: fmt.Sprintf("key_%d", i), Second: i}
+			// })
 		}
 		wg.Wait()
 	}()
