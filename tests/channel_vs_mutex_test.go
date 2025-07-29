@@ -1,4 +1,4 @@
-package tests
+package channel_vs_mutex_tests
 
 import (
 	"fmt"
@@ -33,15 +33,22 @@ func TestChannel(t *testing.T) {
 
 	go func() {
 		defer close(kv_chan)
+		wg := sync.WaitGroup{}
 		for i := range 10 {
-			kv_chan <- Pair[string, int]{First: fmt.Sprintf("key_{%d}", i), Second: i}
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				kv_chan <- Pair[string, int]{First: fmt.Sprintf("key_%d", i), Second: i}
+			}()
 		}
+		wg.Wait()
 	}()
 
 	for kv := range kv_chan {
+		t.Logf("Key Value Pair in main goroutine: '%s', %d", kv.First, kv.Second)
 		values[kv.First] = kv.Second
 	}
-	fmt.Print(values)
+	t.Log("Test Passed")
 }
 
 func TestMutex(t *testing.T) {
@@ -56,5 +63,8 @@ func TestMutex(t *testing.T) {
 		}()
 	}
 	wg.Wait()
-	fmt.Print(values)
+	for k, v := range values.Values {
+		t.Logf("KV Pair in main goroutine: '%s', %d", k, v)
+	}
+	t.Log("Test Passed")
 }
