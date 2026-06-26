@@ -2,11 +2,46 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"log"
 	"os"
 	"reflect"
+	"sync"
+
+	. "go.scripts/result"
 )
+
+func playingWithChannels() {
+	type (
+		payload struct {
+			Meaning int
+		}
+		rpAlias = Result[payload]
+	)
+	someChan := make(chan rpAlias, 2)
+	wg := sync.WaitGroup{}
+	wg.Add(2)
+	go func(ch chan rpAlias) {
+		defer wg.Done()
+		ch <- Ok(payload{42})
+	}(someChan)
+	go func(ch chan rpAlias) {
+		defer wg.Done()
+		ch <- Err[payload](errors.New("Something broke, loser..."))
+	}(someChan)
+	wg.Wait()
+	close(someChan)
+
+	for mResult := range someChan {
+		if mResult.IsErr() {
+			fmt.Fprintf(os.Stderr, "Error from goroutine: %+v\n", mResult)
+		}
+		if mResult.IsOk() {
+			fmt.Printf("From my goroutine: %+v\n", mResult)
+		}
+	}
+}
 
 func SLICE_REFERENCE_BUG_EXAMPLE() {
 	someSlice := []int{}
@@ -92,15 +127,16 @@ func varIsString(v any) bool {
 }
 
 func main() {
-	v := 42
-	if ok := varIsString(v); !ok {
-		fmt.Println("variable 'v' is a string!")
-	} else {
-		fmt.Println("variable 'v' is not a string")
-	}
+	// v := 42
+	// if ok := varIsString(v); !ok {
+	// 	fmt.Println("variable 'v' is a string!")
+	// } else {
+	// 	fmt.Println("variable 'v' is not a string")
+	// }
 
-	HELLO_GO()
-	go GORILLA()
-	WHATS_YOUR_NAME()
-	SLICE_REFERENCE_BUG_EXAMPLE()
+	// HELLO_GO()
+	// go GORILLA()
+	// WHATS_YOUR_NAME()
+	// SLICE_REFERENCE_BUG_EXAMPLE()
+	playingWithChannels()
 }
