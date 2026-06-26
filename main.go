@@ -8,6 +8,61 @@ import (
 	"reflect"
 )
 
+func SLICE_REFERENCE_BUG_EXAMPLE() {
+	someSlice := []int{}
+
+	for i := range 5 {
+		fmt.Println(i)
+		someSlice = append(someSlice, i)
+	}
+
+	x := &someSlice[3]
+	someSlice = append(someSlice, 5)
+	someSlice = append(someSlice, 6)
+	someSlice = append(someSlice, 7)
+	someSlice = append(someSlice, 8)
+	someSlice = append(someSlice, 9)
+	someSlice = append(someSlice, 9)
+	someSlice = append(someSlice, 9)
+	someSlice = append(someSlice, 9)
+	someSlice = append(someSlice, 9)
+	someSlice = append(someSlice, 9)
+	someSlice = append(someSlice, 9)
+	someSlice = append(someSlice, 9)
+	someSlice = append(someSlice, 9)
+	someSlice = append(someSlice, 9)
+	someSlice = append(someSlice, 9)
+	someSlice = append(someSlice, 9)
+	someSlice = append(someSlice, 9)
+	someSlice = append(someSlice, 9)
+	someSlice = append(someSlice, 9)
+	someSlice = append(someSlice, 9)
+	someSlice = append(someSlice, 9)
+	someSlice = append(someSlice, 9)
+	someSlice = append(someSlice, 9)
+	someSlice = append(someSlice, 9)
+	someSlice = append(someSlice, 9)
+	someSlice = append(someSlice, 9)
+	someSlice = append(someSlice, 9)
+	someSlice = append(someSlice, 9)
+	someSlice = append(someSlice, 9)
+	someSlice = append(someSlice, 9)
+	someSlice = append(someSlice, 9)
+	someSlice = append(someSlice, 9)
+	someSlice = append(someSlice, 9)
+
+	// Trying to trigger reallocation, to see what happens to x?
+
+	fmt.Println("What is x now, after an allocation in the slice?", x, *x, &someSlice[3])
+	// Hmmmmm, seems the GC or compiler doesn't clean up or throw an error about x
+	//  but looks like the memory address has changed.
+	// guess X holds a reference to that memory, but the slice has changed to a new backing array
+	*x = 42
+	if *x == someSlice[3] {
+		fmt.Println("YOU'RE AN IDIOT")
+	}
+}
+
 func HELLO_GO() {
 	fmt.Println("Hello Go!")
 }
@@ -47,4 +102,5 @@ func main() {
 	HELLO_GO()
 	go GORILLA()
 	WHATS_YOUR_NAME()
+	SLICE_REFERENCE_BUG_EXAMPLE()
 }
