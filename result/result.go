@@ -1,17 +1,24 @@
 package result
 
+import "errors"
+
 type Result[T any] struct {
 	Value T
 	err   error
 }
 
-func Ok[T any](val T) Result[T] {
-	return Result[T]{val, nil}
+func Ok[T any](value T) Result[T] {
+	return Result[T]{value, nil}
 }
 
 func Err[T any](err error) Result[T] {
 	var t T
 	return Result[T]{t, err}
+}
+
+func ErrFromStr[T any](errMsg string) Result[T] {
+	var t T
+	return Result[T]{t, errors.New(errMsg)}
 }
 
 func (r Result[T]) IsOk() bool {
