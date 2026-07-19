@@ -1,5 +1,7 @@
 package main
 
+// * .vscode/settings.json unusedfund set to false
+
 import (
 	"bufio"
 	"errors"
@@ -7,6 +9,7 @@ import (
 	"log"
 	"os"
 	"reflect"
+	"runtime/debug"
 	"sync"
 
 	. "go.scripts/result"
@@ -43,7 +46,7 @@ func playingWithChannels() {
 	}
 }
 
-func SLICE_REFERENCE_BUG_EXAMPLE() {
+func referenceToSliceProblems() {
 	someSlice := []int{}
 
 	for i := range 5 {
@@ -98,10 +101,7 @@ func SLICE_REFERENCE_BUG_EXAMPLE() {
 	}
 }
 
-func HELLO_GO() {
-	fmt.Println("Hello Go!")
-}
-func WHATS_YOUR_NAME() {
+func whatsYourName() {
 	fmt.Println("What is your name?")
 	reader := bufio.NewReader(os.Stdin)
 	name, err := reader.ReadString('\n')
@@ -111,7 +111,7 @@ func WHATS_YOUR_NAME() {
 		log.Fatal(err)
 	}
 }
-func GORILLA() {
+func gorilla() {
 	gorilla := '🦍'
 	fmt.Printf("gorilla: %v %v", gorilla, reflect.TypeOf(gorilla))
 }
@@ -124,6 +124,14 @@ func varIsString(v any) bool {
 	// }
 	_, ok := v.(string)
 	return ok
+}
+
+func appName() string {
+	info, ok := debug.ReadBuildInfo()
+	if !ok {
+		return "badman lol ..."
+	}
+	return info.Main.Path
 }
 
 func main() {
@@ -139,4 +147,11 @@ func main() {
 	// WHATS_YOUR_NAME()
 	// SLICE_REFERENCE_BUG_EXAMPLE()
 	playingWithChannels()
+	fmt.Println(appName())
+	// fmt.Println("Num args:", len(os.Args), os.Args)
+	some := make(map[string]any)
+	fmt.Printf("Some map: %v %v", some, some == nil)
+	for k, v := range some {
+		fmt.Println(k, v)
+	}
 }
