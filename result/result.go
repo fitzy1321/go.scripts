@@ -2,6 +2,15 @@ package result
 
 import "errors"
 
+type IResult interface {
+	IsOk() bool
+	IsErr() bool
+	GetError() error
+}
+
+// compile time type assertion for an interface.
+var _ IResult = (*Result[int])(nil)
+
 type Result[T any] struct {
 	Value T
 	err   error
@@ -21,15 +30,15 @@ func ErrFromStr[T any](errMsg string) Result[T] {
 	return Result[T]{t, errors.New(errMsg)}
 }
 
-func (r Result[T]) IsOk() bool {
+func (r *Result[T]) IsOk() bool {
 	return r.err == nil
 }
 
-func (r Result[T]) IsErr() bool {
+func (r *Result[T]) IsErr() bool {
 	return r.err != nil
 }
 
-func (r Result[T]) GetError() error {
+func (r *Result[T]) GetError() error {
 	return r.err
 }
 
